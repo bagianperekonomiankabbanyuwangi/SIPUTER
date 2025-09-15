@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Data Perputaran Ekonomi Festival</title>
+  <style>
+    /* === RESET & BASE STYLES === */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: #f0f2f5; 
+      color: #333;
+      padding: 20px;
+    }
+    /* === LOGIN SCREEN === */
+    .login-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .login-container h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .role-selector {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .role-btn {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 6px 6px 0 0;
+    }
+    .role-btn.active {
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-size: 14px;
+    }
+    input[type="text"], 
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button.login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #e74c3c;
+    }
+    /* === MAIN APP (sembunyikan jika belum login) === */
+    .main-app {
+      display: none;
+    }
+    /* === LAYOUT === */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      border-radius: 10px;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1, h2 { margin-bottom: 15px; }
+    /* === AUTH BAR (LOGOUT) === */
+    #auth-bar {
+      background: #28a745;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 0 0 10px 10px;
+      margin-bottom: 20px;
+    }
+    /* === NAVIGATION === */
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .nav-tab {
+      padding: 15px 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      text-align: center;
+      flex: 1;
+    }
+    .nav-tab.active {
+      background: #28a745;
+      color: white;
+    }
+    .nav-tab:hover:not(.active) {
+      background: #e9ecef;
+    }
+    /* === CONTENT SECTIONS === */
+    .content-section {
+      display: none;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+    .content-section.active {
+      display: block;
+    }
+    /* === FORM STYLES === */
+    .form-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      color: #495057;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    input:focus, select:focus {
+      border-color: #28a745;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+    }
+    input[readonly] {
+      background: #e9ecef;
+      cursor: not-allowed;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .field-group {
+      margin-bottom: 15px;
+    }
+    /* === BUTTONS === */
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn-primary {
+      background: #28a745;
+      color: #fff;
+      width: 100%;
+      margin-top: 25px;
+    }
+    .btn-primary:hover {
+      background: #218838;
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    .btn-info {
+      background: #17a2b8;
+      color: white;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    .btn-info:hover {
+      background: #138496;
+    }
+    /* === CARDS === */
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .summary-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .summary-card h3 {
+      color: #6c757d;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .summary-card .value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #28a745;
+    }
+    /* === TABLE === */
+    .table-container {
+      overflow-x: auto;
+      max-height: 70vh;
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      min-width: 1800px;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    th, td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+      text-align: left;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    th {
+      background: #28a745;
+      color: #fff;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    td.currency {
+      text-align: right;
+      font-family: monospace;
+    }
+    td.number {
+      text-align: right;
+    }
+    td.center {
+      text-align: center;
+    }
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    tr:hover {
+      background-color: #e9ecef;
+    }
+    /* Responsive table columns */
+    th:first-child, td:first-child { min-width: 40px; }
+    th:nth-child(2), td:nth-child(2) { min-width: 150px; }
+    th:nth-child(3), td:nth-child(3) { min-width: 80px; }
+    th:nth-child(4), td:nth-child(4) { min-width: 100px; }
+    th:nth-child(5), td:nth-child(5) { min-width: 100px; }
+    th:nth-child(6), td:nth-child(6) { min-width: 60px; }
+    th:nth-child(7), td:nth-child(7) { min-width: 80px; }
+    th:nth-child(8), td:nth-child(8) { min-width: 120px; }
+    th:nth-child(9), td:nth-child(9) { min-width: 120px; }
+    th:nth-child(10), td:nth-child(10) { min-width: 100px; }
+    th:nth-child(11), td:nth-child(11) { min-width: 100px; }
+    th:nth-child(12), td:nth-child(12) { min-width: 100px; }
+    th:nth-child(13), td:nth-child(13) { min-width: 100px; }
+    th:nth-child(14), td:nth-child(14) { min-width: 120px; }
+    th:nth-child(15), td:nth-child(15) { min-width: 130px; }
+    th:nth-child(16), td:nth-child(16) { min-width: 100px; }
+    th:nth-child(17), td:nth-child(17) { min-width: 80px; }
+    /* === FILTERS === */
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    /* === STATUS MESSAGES === */
+    .status-message {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      text-align: center;
+      display: none;
+    }
+    .status-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .status-info {
+      background-color: #cce5ff;
+      color: #004085;
+      border: 1px solid #b8daff;
+    }
+    /* === MODAL === */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: #000;
+    }
+    .detail-item {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #495057;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .detail-value {
+      color: #212529;
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .summary-buttons {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+    /* === PRINT STYLES === */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .print-container, .print-container * {
+        visibility: visible;
+      }
+      .print-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+        background: white;
+        max-height: none;
+        overflow: visible;
+      }
+      .print-chart {
+        width: 400px !important;
+        height: 300px !important;
+        margin: 0 auto;
+        display: block;
+      }
+      .nav-tabs, .filters, .btn, .table-header, .status-message, .modal, #auth-bar {
+        display: none !important;
+      }
+      table {
+        box-shadow: none;
+        min-width: 100%;
+        width: 100%;
+      }
+      th {
+        background: #28a745 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      @page {
+        margin: 1.5cm;
+        size: A4 portrait;
+      }
+    }
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .filters {
+        flex-direction: column;
+      }
+      .nav-tabs {
+        flex-direction: column;
+      }
+      .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      table {
+        min-width: 1000px;
+      }
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- === LAYAR LOGIN === -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-container">
+      <h2>Sistem Festival</h2>
+      <p style="color: #666; margin-bottom: 20px;">Silakan login terlebih dahulu</p>
+      <!-- Pilih Role -->
+      <div class="role-selector">
+        <div class="role-btn active" id="admin-btn">Admin</div>
+        <div class="role-btn" id="user-btn">User</div>
+      </div>
+      <!-- Form Login -->
+      <form id="login-form">
+        <input type="hidden" id="role" value="admin" />
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Masukkan username" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Masukkan password" required />
+        </div>
+        <button type="submit" class="login-btn">Login</button>
+      </form>
+      <p class="message" id="error-message"></p>
+    </div>
+  </div>
+  <!-- === APLIKASI UTAMA (diperlihatkan setelah login) === -->
+  <div id="main-app" class="main-app">
+    <!-- BAR LOGOUT -->
+    <div id="auth-bar">
+      <span id="welcome-user">Halo, <strong id="role-display">User</strong>!</span>
+      <button id="logout-btn" class="btn btn-secondary">Logout</button>
+    </div>
+    <div class="container">
+      <header>
+        <h1>Sistem Data Perputaran Ekonomi Festival</h1>
+        <p>BAGIAN PEREKONOMIAN SETDA KABUPATEN BANYUWANGI</p>
+      </header>
+      <!-- Navigation Tabs -->
+      <div class="nav-tabs">
+        <div class="nav-tab active" data-target="inputSection">Input Data</div>
+        <div class="nav-tab" data-target="eventsSection">Daftar Event</div>
+        <div class="nav-tab" data-target="summarySection">Ringkasan</div>
+      </div>
+      <!-- Input Section -->
+      <div id="inputSection" class="content-section active">
+        <div class="card">
+          <h2>Input Data Event Baru</h2>
+          <div id="statusMessage" class="status-message"></div>
+          <form id="eventForm" class="form-container">
+            <div class="field-group">
+              <label>Nama Penginput (Username)</label>
+              <input type="text" name="NamaPenginput" id="namaPenginput" required readonly>
+            </div>
+            <div class="field-group">
+              <label>Nama Event</label>
+              <input type="text" name="NamaEvent" required>
+            </div>
+            <div class="field-group">
+              <label>Jenis Event</label>
+              <select name="JenisEvent" id="jenisEvent" required>
+                <option value="">-- Pilih Jenis --</option>
+                <option value="Lokal">Lokal</option>
+                <option value="Nasional">Nasional</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="field-group">
+                <label>Tanggal Mulai</label>
+                <input type="date" name="TglMulai" id="tglMulai" required>
+              </div>
+              <div class="field-group">
+                <label>Tanggal Akhir</label>
+                <input type="date" name="TglAkhir" id="tglAkhir" required>
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Lama Hari</label>
+              <input type="number" name="LamaHari" id="lamaHari" readonly>
+            </div>
+            <div class="field-group">
+              <label>Jumlah Pengunjung</label>
+              <input type="number" name="JumlahPengunjung">
+            </div>
+            <div class="field-group">
+              <label>Produksi Event (Rp)</label>
+              <input type="number" name="ProduksiEvent">
+            </div>
+            <div class="field-group">
+              <label>Keterangan Produksi</label>
+              <input type="text" name="KetProduksi">
+            </div>
+            <div class="form-row">
+              <div class="field-group">
+                <label>Jumlah UMKM</label>
+                <input type="number" name="JumlahUMKM" id="jumlahUMKM">
+              </div>
+              <div class="field-group">
+                <label>Pendapatan Estimasi per UMKM (Rp)</label>
+                <input type="number" name="PendapatanUMKM" id="PendapatanUMKM">
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Total UMKM (Rp)</label>
+              <input type="number" name="TotalUMKM" id="totalUMKM" readonly>
+            </div>
+            <div class="field-group">
+              <label>Keterangan UMKM</label>
+              <input type="text" name="KetUMKM">
+            </div>
+            <div class="field-group">
+              <label>Parkir (Rp)</label>
+              <input type="number" name="Parkir">
+            </div>
+            <div class="field-group">
+              <label>Keterangan Parkir</label>
+              <input type="text" name="KetParkir">
+            </div>
+            <div class="field-group">
+              <label>Pendukung</label>
+              <input type="text" name="Pendukung">
+            </div>
+            <div class="form-row">
+              <div class="field-group">
+                <label>Jumlah Talent</label>
+                <input type="number" name="JumlahTalent" id="jumlahTalent">
+              </div>
+              <div class="field-group">
+                <label>Estimasi Kostum (Rp)</label>
+                <input type="number" name="EstimasiKostum" id="estimasiKostum">
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Total Kostum (Rp)</label>
+              <input type="number" name="TotalKostum" id="totalKostum" readonly>
+            </div>
+            <div id="conditionalFields">
+              <div class="field-group">
+                <label>Hotel & Homestay (Rp)</label>
+                <input type="number" name="Hotel">
+              </div>
+              <div class="field-group">
+                <label>Keterangan Hotel</label>
+                <input type="text" name="KetHotel">
+              </div>
+              <div class="field-group">
+                <label>Resto & Oleh-oleh (Rp)</label>
+                <input type="number" name="Resto">
+              </div>
+              <div class="field-group">
+                <label>Keterangan Resto</label>
+                <input type="text" name="KetResto">
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Lain-lain (Rp)</label>
+              <input type="number" name="Lainnya">
+            </div>
+            <div class="field-group">
+              <label>Keterangan Lain-lain</label>
+              <input type="text" name="KetLainlain">
+            </div>
+            <div class="field-group">
+              <label>Total Ekonomi (Rp)</label>
+              <input type="number" name="TotalEkonomi" id="totalEkonomi" readonly>
+            </div>
+            <!-- Admin Only Fields -->
+            <div id="adminFields">
+              <div class="field-group">
+                <label>Multiplier Effect</label>
+                <input type="text" name="Multiplier" id="multiplier" readonly>
+              </div>
+              <div class="field-group">
+                <label>Kategori</label>
+                <input type="text" name="Kategori" id="kategori" readonly>
+              </div>
+              <div class="field-group">
+                <label>Kesimpulan</label>
+                <input type="text" name="Kesimpulan" id="kesimpulan" readonly>
+              </div>
+              <div class="field-group">
+                <label>Saran</label>
+                <input type="text" name="Saran" id="saran" readonly>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Simpan Data</button>
+          </form>
+        </div>
+      </div>
+      <!-- Events Section -->
+      <div id="eventsSection" class="content-section">
+        <div class="card">
+          <div class="table-header">
+            <h2>Daftar Event</h2>
+            <div>
+              <button id="refreshEvents" class="btn btn-secondary">Refresh Data</button>
+              <button id="printEvents" class="btn btn-info">Cetak Data</button>
+              <!-- Tombol Rekap Event (Hanya untuk Admin) -->
+              <button id="rekapEvents" class="btn btn-primary" style="display:none;">Rekap Event</button>
+            </div>
+          </div>
+          <div class="filters">
+            <div class="filter-group">
+              <label>Cari Event</label>
+              <input type="text" id="searchEvent" placeholder="Masukkan nama event...">
+            </div>
+            <div class="filter-group">
+              <label>Filter Jenis</label>
+              <select id="filterJenis">
+                <option value="">Semua Jenis</option>
+                <option value="Lokal">Lokal</option>
+                <option value="Nasional">Nasional</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Filter Kategori</label>
+              <select id="filterKategori">
+                <option value="">Semua Kategori</option>
+                <option value="Ekonomi Tinggi">Ekonomi Tinggi</option>
+                <option value="Ekonomi Menengah">Ekonomi Menengah</option>
+                <option value="Ekonomi Rendah">Ekonomi Rendah</option>
+                <option value="Ekonomi Minimal">Ekonomi Minimal</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Urutkan</label>
+              <select id="sortBy">
+                <option value="Tanggal">Tanggal (Terbaru)</option>
+                <option value="NamaEvent">Nama Event</option>
+                <option value="TotalEkonomi">Total Ekonomi (Tertinggi)</option>
+              </select>
+            </div>
+          </div>
+          <div id="eventsStatus" class="status-message"></div>
+          <div class="table-container">
+            <table id="eventsTable">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama Penginput</th>
+                  <th>Nama Event</th>
+                  <th>Jenis</th>
+                  <th>Tanggal Mulai</th>
+                  <th>Tanggal Akhir</th>
+                  <th>Lama (Hari)</th>
+                  <th>Pengunjung</th>
+                  <th>Produksi Event (Rp)</th>
+                  <th>Total UMKM (Rp)</th>
+                  <th>Parkir (Rp)</th>
+                  <th>Hotel (Rp)</th>
+                  <th>Resto (Rp)</th>
+                  <th>Lainnya (Rp)</th>
+                  <th>Total Kostum (Rp)</th>
+                  <th>Total Ekonomi (Rp)</th>
+                  <th>Kategori</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Summary Section -->
+      <div id="summarySection" class="content-section">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Ringkasan Data Event</h2>
+            <button id="printSummary" class="btn btn-info">Cetak Ringkasan</button>
+          </div>
+          <div class="summary-cards">
+            <div class="summary-card">
+              <h3>Total Event</h3>
+              <div class="value" id="totalEvents">0</div>
+            </div>
+            <div class="summary-card">
+              <h3>Total Nilai Ekonomi</h3>
+              <div class="value" id="totalEconomy">Rp 0</div>
+            </div>
+            <div class="summary-card">
+              <h3>Rata-rata per Event</h3>
+              <div class="value" id="averageEconomy">Rp 0</div>
+            </div>
+            <div class="summary-card">
+              <h3>Event Terbesar</h3>
+              <div class="value" id="biggestEvent">-</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="card">
+              <h3>Distribusi Jenis Event</h3>
+              <canvas id="eventTypeChart"></canvas>
+            </div>
+            <div class="card">
+              <h3>Distribusi Kategori Event</h3>
+              <canvas id="eventCategoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal untuk Detail Event -->
+    <div id="eventDetailModal" class="modal">
+      <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Detail Event</h2>
+          <div>
+            <button id="printDetail" class="btn btn-info">Cetak Detail</button>
+            <span class="close">&times;</span>
+          </div>
+        </div>
+        <div id="eventDetailContent"></div>
+      </div>
+    </div>
+    <!-- Modal untuk Rekap Event Gabungan -->
+    <div id="rekapModal" class="modal">
+      <div class="modal-content" style="max-width:1200px; max-height:90vh; overflow:auto;">
+        <h2 style="text-align:center; color:#28a745;">Rekap Event Gabungan</h2>
+        <p style="text-align:center; color:#666;">Dibuat: <span id="rekapDate"></span></p>
+        <div class="table-container" style="margin-top:20px;">
+          <table id="rekapTable" style="width:100%; border-collapse:collapse; font-size:12px;"></table>
+        </div>
+        <div class="modal-buttons">
+          <button id="printRekap" class="btn btn-info">Cetak Rekap</button>
+          <button class="btn btn-secondary" onclick="this.closest('.modal').style.display='none'">Tutup</button>
+        </div>
+      </div>
+    </div>
+    <!-- Modal untuk Detail Rekap Gabungan -->
+    <div id="rekapDetailModal" class="modal">
+      <div class="modal-content" style="max-width:800px;">
+        <h2 style="text-align:center; color:#28a745;">Detail Rekap Event Gabungan</h2>
+        <p style="text-align:center; color:#666;">Event: <span id="rekapDetailEventName"></span></p>
+        <div id="rekapDetailContent" style="margin-top:20px;"></div>
+        <div class="modal-buttons">
+          <button id="printRekapDetail" class="btn btn-info">Cetak Detail</button>
+          <button class="btn btn-secondary" onclick="this.closest('.modal').style.display='none'">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- SCRIPT -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // === Login Handler (Terhubung ke Backend) ===
+    document.getElementById("login-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const role = document.getElementById("role").value;
+      // <!-- PERBAIKAN UX: Validasi wajib pilih role -->
+      if (!document.querySelector('.role-btn.active')) {
+        document.getElementById("error-message").textContent = "Silakan pilih peran (Admin/User) terlebih dahulu!";
+        return;
+      }
+      if (!username || !password) {
+        document.getElementById("error-message").textContent = "Username dan password harus diisi!";
+        return;
+      }
+      try {
+        // Kirim permintaan validasi ke backend
+        const validationUrl = `${CONFIG.SCRIPT_URL}?action=validateLogin&token=${username}&password=${encodeURIComponent(password)}&role=${role}`;
+        const response = await fetch(validationUrl);
+        if (!response.ok) {
+          throw new Error('Respons jaringan tidak OK');
+        }
+        const result = await response.json();
+        if (result.status === "success") {
+          // Simpan informasi login ke localStorage
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("userRole", role); // Role diambil dari pilihan di UI
+          localStorage.setItem("username", username);
+          localStorage.setItem("authToken", username); // Simpan token untuk permintaan POST/GET berikutnya
+          // Tampilkan aplikasi utama
+          checkAuth();
+        } else {
+          // Tampilkan pesan error dari backend
+          document.getElementById("error-message").textContent = result.message || "Login gagal!";
+        }
+      } catch (error) {
+        console.error("Error during login:", error);
+        document.getElementById("error-message").textContent = "Gagal terhubung ke server. Periksa koneksi Anda.";
+      }
+    });
+    // === Cek Login & Tampilkan Aplikasi ===
+    function checkAuth() {
+	  const isLoggedIn = localStorage.getItem("isLoggedIn");
+	  const userRole = localStorage.getItem("userRole");
+	  const username = localStorage.getItem("username");
+	  if (isLoggedIn === "true") {
+		document.getElementById("login-screen").style.display = "none";
+		document.getElementById("main-app").style.display = "block";
+		document.getElementById("role-display").textContent = userRole === "admin" ? "Admin" : "User";
+		document.getElementById("namaPenginput").value = username;
+		setupRoleAccess(userRole);
+		if (userRole !== "admin") {
+		  setupUserSpecificAccess(username);
+		}
+         // --- PERBAIKAN: Reset Navigasi ke Tab Default Setiap Login ---
+		// Cari tab "Input Data" dan aktifkan
+		const inputTab = document.querySelector('[data-target="inputSection"]');
+		const activeTabs = document.querySelectorAll('.nav-tab.active');
+		activeTabs.forEach(tab => tab.classList.remove('active'));
+		inputTab.classList.add('active');
+		// Sembunyikan semua section, lalu tampilkan hanya "Input Data"
+		const allSections = document.querySelectorAll('.content-section');
+		allSections.forEach(section => section.classList.remove('active'));
+		document.getElementById('inputSection').classList.add('active');
+        // --- AKHIR PERBAIKAN ---
+	  } else {
+		document.getElementById("login-screen").style.display = "flex";
+		document.getElementById("main-app").style.display = "none";
+      }
+    }
+    // === Setup Akses Berdasarkan Role ===
+function setupRoleAccess(userRole) {
+  const summaryTab = document.querySelector('[data-target="summarySection"]');
+  const adminFields = document.getElementById("adminFields");
+  const namaPenginput = document.getElementById("namaPenginput");
+  const rekapButton = document.getElementById("rekapEvents");
+  if (userRole === "admin") {
+    // --- PERBAIKAN KRITIS: ADMIN HARUS LIHAT SEMUA FIELD ---
+    // Tampilkan semua field yang biasanya disembunyikan untuk dinas
+    const adminVisibleFields = [
+      'jumlahUMKM', 'PendapatanUMKM', 'totalUMKM', 'KetUMKM',
+      'Parkir', 'KetParkir',
+      'jumlahTalent', 'estimasiKostum', 'totalKostum', 'Pendukung',
+      'Hotel', 'KetHotel', 'Resto', 'KetResto',
+      'lamaHari', 'totalEkonomi'
+    ];
+    adminVisibleFields.forEach(fieldId => {
+      const element = document.getElementById(fieldId) || 
+                      document.querySelector(`input[name="${fieldId}"]`) || 
+                      document.querySelector(`input[name="${fieldId.replace(/([A-Z])/g, ' $1').trim()}"]`);
+      if (element) {
+        const container = element.closest('.field-group') || 
+                          element.closest('.form-row') || 
+                          element.parentElement;
+        if (container) container.style.display = 'block';
+        const label = element.previousElementSibling;
+        if (label && label.tagName === 'LABEL') label.style.display = 'block';
+      }
+    });
+    // Tampilkan field admin-only
+    summaryTab.style.display = "flex";
+    adminFields.style.display = "block";
+    namaPenginput.readOnly = false;
+    rekapButton.style.display = "inline-block";
+  } else {
+    // Untuk user biasa, sembunyikan field admin-only
+    summaryTab.style.display = "none";
+    adminFields.style.display = "none";
+    namaPenginput.readOnly = true;
+    rekapButton.style.display = "none";
+  }
+  window.currentUserRole = userRole;
+}
+    // === Setup Akses Spesifik User Berdasarkan Username ===
+    // <!-- PERBAIKAN KRITIS: Admin HARUS melihat SEMUA field -->
+    function setupUserSpecificAccess(username) {
+      // Jika username adalah "admin", maka ini adalah kesalahan sistem!
+      // Karena jika userRole === "admin", fungsi ini TIDAK akan dipanggil.
+      // Jadi jika fungsi ini dipanggil dengan username="admin", artinya userRole bukan admin — tapi kita tetap ingin field admin muncul.
+      // Jadi, kita abaikan semua penyembunyian jika username adalah "admin".
+      if (username === "admin") {
+        // Biarkan semua field tetap terlihat — karena ini adalah kasus admin login sebagai admin.
+        // Tidak ada penyembunyian, dan tidak ada penampilan ulang karena sudah diatur oleh setupRoleAccess.
+        return;
+      }
+      // Hanya sembunyikan field-field spesifik DINAS jika user BUKAN dinas6
+      if (username !== 'dinas6') {
+        // Sembunyikan SEMUA field spesifik dinas + field otomatis
+        const fieldsToHide = [
+          'jumlahUMKM', 'PendapatanUMKM', 'totalUMKM', 'KetUMKM',
+          'Parkir', 'KetParkir',
+          'jumlahTalent', 'estimasiKostum', 'totalKostum', 'Pendukung',
+          'Hotel', 'KetHotel', 'Resto', 'KetResto',
+          'lamaHari', 'totalEkonomi'
+        ];
+        fieldsToHide.forEach(fieldId => {
+          const element = document.getElementById(fieldId) || 
+                          document.querySelector(`input[name="${fieldId}"]`) || 
+                          document.querySelector(`input[name="${fieldId.replace(/([A-Z])/g, ' $1').trim()}"]`);
+          if (element) {
+            // Cari pembungkus: .field-group > .form-row > parent biasa
+            const container = element.closest('.field-group') || 
+                              element.closest('.form-row') || 
+                              element.parentElement;
+            if (container) {
+              container.style.setProperty('display', 'none', 'important');
+            }
+            // Sembunyikan label yang langsung mendahului input
+            const label = element.previousElementSibling;
+            if (label && label.tagName === 'LABEL') {
+              label.style.setProperty('display', 'none', 'important');
+            }
+          }
+        });
+      }
+      // Tampilkan field berdasarkan username (kecuali dinas6, karena sudah ditangani di atas)
+      if (username === 'dinas1') { // Disbudpar
+        const fieldsToShow = [
+          'jumlahTalent', 'estimasiKostum', 'totalKostum', 'Pendukung', 
+          'Hotel', 'KetHotel', 'Resto', 'KetResto',
+          'lamaHari', 'totalEkonomi'
+        ];
+        fieldsToShow.forEach(fieldId => {
+          const element = document.getElementById(fieldId) || document.querySelector(`input[name="${fieldId}"]`);
+          if (element) {
+            const container = element.closest('.field-group') || 
+                              element.closest('.form-row') || 
+                              element.parentElement;
+            if (container) container.style.display = 'block';
+            const label = element.previousElementSibling;
+            if (label && label.tagName === 'LABEL') label.style.display = 'block';
+          }
+        });
+      } else if (username === 'dinas2') { // Dinas UKM
+        const fieldsToShow = ['jumlahUMKM', 'PendapatanUMKM', 'totalUMKM', 'KetUMKM', 'lamaHari', 'totalEkonomi'];
+        fieldsToShow.forEach(fieldId => {
+          const element = document.getElementById(fieldId) || document.querySelector(`input[name="${fieldId}"]`);
+          if (element) {
+            const container = element.closest('.field-group') || 
+                              element.closest('.form-row') || 
+                              element.parentElement;
+            if (container) container.style.display = 'block';
+            const label = element.previousElementSibling;
+            if (label && label.tagName === 'LABEL') label.style.display = 'block';
+          }
+        });
+      } else if (username === 'dinas3') { // Dinas Perhubungan
+        const fieldsToShow = ['Parkir', 'KetParkir', 'lamaHari', 'totalEkonomi'];
+        fieldsToShow.forEach(fieldId => {
+          const element = document.getElementById(fieldId) || document.querySelector(`input[name="${fieldId}"]`);
+          if (element) {
+            const container = element.closest('.field-group') || 
+                              element.closest('.form-row') || 
+                              element.parentElement;
+            if (container) container.style.display = 'block';
+            const label = element.previousElementSibling;
+            if (label && label.tagName === 'LABEL') label.style.display = 'block';
+          }
+        });
+      } else if (username === 'dinas4' || username === 'dinas5') { // Disdik/Dispora
+        const fieldsToShow = ['jumlahTalent', 'estimasiKostum', 'totalKostum', 'Pendukung', 'lamaHari', 'totalEkonomi'];
+        fieldsToShow.forEach(fieldId => {
+          const element = document.getElementById(fieldId) || document.querySelector(`input[name="${fieldId}"]`);
+          if (element) {
+            const container = element.closest('.field-group') || 
+                              element.closest('.form-row') || 
+                              element.parentElement;
+            if (container) container.style.display = 'block';
+            const label = element.previousElementSibling;
+            if (label && label.tagName === 'LABEL') label.style.display = 'block';
+          }
+        });
+      }
+      // Untuk dinas6, tidak perlu menampilkan/menyembunyikan apa-apa karena semua field sudah terlihat (kecuali field admin)
+    }
+    // === Logout Handler ===
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      if (confirm("Yakin ingin logout?")) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("username");
+        localStorage.removeItem("authToken"); // <-- Tambahkan ini
+        // --- PERBAIKAN: Reset AppState saat logout ---
+        if (typeof AppState !== 'undefined') {
+          AppState.allEvents = [];
+        }
+        // --- AKHIR PERBAIKAN ---
+        checkAuth();
+      }
+    });
+    // === Switch Role di Login ===
+    document.getElementById("admin-btn").addEventListener("click", () => {
+      document.getElementById("admin-btn").classList.add("active");
+      document.getElementById("user-btn").classList.remove("active");
+      document.getElementById("role").value = "admin";
+      document.getElementById("error-message").textContent = "";
+    });
+    document.getElementById("user-btn").addEventListener("click", () => {
+      document.getElementById("user-btn").classList.add("active");
+      document.getElementById("admin-btn").classList.remove("active");
+      document.getElementById("role").value = "user";
+      document.getElementById("error-message").textContent = "";
+    });
+    // === Jalankan saat halaman dimuat ===
+    window.addEventListener("DOMContentLoaded", checkAuth);
+    // === SISANYA TIDAK BERUBAH ===
+    const CONFIG = {
+      SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxK_I7L7UTHtdZX2Ja6MmWUa4RCC_Ju4kxecx-ehidcd6bF5C2XnLpQwCL15NJnUMdJ/exec",
+      CHART_COLORS: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+      ECONOMIC_THRESHOLDS: {
+        HIGH: 1000000000,
+        MEDIUM: 500000000,
+        LOW: 100000000
+      }
+    };
+    const AppState = {
+      allEvents: [],
+      charts: {
+        eventType: null,
+        eventCategory: null
+      },
+      currentFilter: {
+        search: '',
+        jenis: '',
+        kategori: '',
+        sort: 'Tanggal'
+      },
+      currentEventDetail: null
+    };
+    const Elements = {
+      navTabs: document.querySelectorAll('.nav-tab'),
+      contentSections: document.querySelectorAll('.content-section'),
+      eventForm: document.getElementById('eventForm'),
+      eventsTable: document.getElementById('eventsTable'),
+      modal: document.getElementById('eventDetailModal'),
+      statusMessage: document.getElementById('statusMessage'),
+      eventsStatus: document.getElementById('eventsStatus'),
+      printDetailBtn: document.getElementById('printDetail'),
+      printSummaryBtn: document.getElementById('printSummary')
+    };
+    const Utils = {
+      formatRupiah: (value) => new Intl.NumberFormat('id-ID').format(value || 0),
+      formatDate: (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('id-ID');
+      },
+      showStatus: (element, message, type) => {
+        element.textContent = message;
+        element.className = `status-message status-${type}`;
+        element.style.display = 'block';
+        if (type !== 'error') {
+          setTimeout(() => element.style.display = 'none', 5000);
+        }
+      },
+      getEconomicCategory: (value) => {
+        const economy = parseFloat(value) || 0;
+        if (economy >= CONFIG.ECONOMIC_THRESHOLDS.HIGH) return 'Ekonomi Tinggi';
+        if (economy >= CONFIG.ECONOMIC_THRESHOLDS.MEDIUM) return 'Ekonomi Menengah';
+        if (economy >= CONFIG.ECONOMIC_THRESHOLDS.LOW) return 'Ekonomi Rendah';
+        return 'Ekonomi Minimal';
+      },
+      extractFieldValue: (event, possibleFields) => {
+        for (const field of possibleFields) {
+          if (event[field] && event[field].toString().trim()) {
+            return event[field].toString().trim();
+          }
+        }
+        return null;
+      }
+    };
+    // === Tambahkan Fungsi Validasi Event Duplikat ===
+    const EventValidator = {
+      isEventDuplicate: function(eventName, startDate, endDate) {
+        return AppState.allEvents.some(event => {
+          return event['Nama Event'] === eventName &&
+                 event['Tgl Mulai'] === startDate &&
+                 event['Tgl Akhir'] === endDate;
+        });
+      },
+      getExistingEvent: function(eventName, startDate, endDate) {
+        return AppState.allEvents.find(event => {
+          return event['Nama Event'] === eventName &&
+                 event['Tgl Mulai'] === startDate &&
+                 event['Tgl Akhir'] === endDate;
+        });
+      }
+    };
+    const FormHandler = {
+      init() {
+        Elements.eventForm.addEventListener('input', this.handleFormInput.bind(this));
+        Elements.eventForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+        document.getElementById('tglMulai').addEventListener('change', this.calculateDays);
+        document.getElementById('tglAkhir').addEventListener('change', this.calculateDays);
+        document.getElementById('jenisEvent').addEventListener('change', this.toggleConditionalFields);
+      },
+      calculateDays() {
+        const startDate = document.getElementById('tglMulai').value;
+        const endDate = document.getElementById('tglAkhir').value;
+        const daysInput = document.getElementById('lamaHari');
+        if (startDate && endDate) {
+          const start = new Date(startDate);
+          const end = new Date(endDate);
+          const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+          daysInput.value = diffDays > 0 ? diffDays : 0;
+        }
+      },
+      toggleConditionalFields() {
+        const jenisEvent = document.getElementById('jenisEvent').value;
+        const conditionalFields = document.getElementById('conditionalFields');
+        conditionalFields.style.display = jenisEvent === 'Lokal' ? 'none' : 'block';
+      },
+      handleFormInput() {
+        const formData = new FormData(Elements.eventForm);
+        const days = parseInt(document.getElementById('lamaHari').value) || 1;
+        const umkmTotal = (parseInt(formData.get('JumlahUMKM')) || 0) * 
+                         (parseInt(formData.get('PendapatanUMKM')) || 0) * days;
+        document.getElementById('totalUMKM').value = umkmTotal;
+        const kostumTotal = (parseInt(formData.get('JumlahTalent')) || 0) * 
+                           (parseInt(formData.get('EstimasiKostum')) || 0) * days;
+        document.getElementById('totalKostum').value = kostumTotal;
+        const ekonomiTotal = [
+          'ProduksiEvent', 'Parkir', 'Hotel', 'Resto', 'Lainnya'
+        ].reduce((sum, field) => sum + (parseInt(formData.get(field)) || 0), 0) + 
+        umkmTotal + kostumTotal;
+        document.getElementById('totalEkonomi').value = ekonomiTotal;
+        const userRole = localStorage.getItem("userRole");
+        if (userRole === "admin") {
+          const produksi = parseInt(formData.get('ProduksiEvent')) || 0;
+          const multiplier = produksi > 0 ? (ekonomiTotal / produksi).toFixed(2) : '0';
+          document.getElementById('multiplier').value = `${multiplier} ${multiplier > 1 ? '(Positif)' : '(Belum maksimal)'}`;
+          const category = Utils.getEconomicCategory(ekonomiTotal);
+          document.getElementById('kategori').value = category;
+          if (category === 'Ekonomi Minimal') {
+            document.getElementById('kesimpulan').value = 'Dampak ekonomi masih rendah';
+            document.getElementById('saran').value = 'Perlu strategi promosi dan peningkatan partisipasi';
+          } else if (category === 'Ekonomi Rendah' || category === 'Ekonomi Menengah') {
+            document.getElementById('kesimpulan').value = 'Dampak ekonomi cukup baik';
+            document.getElementById('saran').value = 'Pertahankan kualitas dan libatkan lebih banyak UMKM';
+          } else {
+            document.getElementById('kesimpulan').value = 'Dampak ekonomi sangat baik';
+            document.getElementById('saran').value = 'Event bisa dijadikan agenda rutin berskala besar';
+          }
+        }
+      },
+      // === Modifikasi Fungsi Submit ===
+      async handleFormSubmit(e) {
+        e.preventDefault();
+        const formData = new FormData(Elements.eventForm);
+        const data = Object.fromEntries(formData.entries());
+        // Ambil token dari localStorage
+        const authToken = localStorage.getItem("authToken");
+        console.log(data);
+        console.log(authToken);
+        data.token = authToken; // Tambahkan token ke payload
+        // Ambil data inti untuk cek duplikasi
+        const eventName = data['NamaEvent'];
+        const startDate = data['TglMulai'];
+        const endDate = data['TglAkhir'];
+        // Cek apakah event sudah ada
+        if (EventValidator.isEventDuplicate(eventName, startDate, endDate)) {
+          const existingEvent = EventValidator.getExistingEvent(eventName, startDate, endDate);
+          const userRole = localStorage.getItem("userRole");
+          // Jika user BIASA dan Produksi Event sudah diisi, SIMPAN nilai yang sudah ada
+          if (userRole !== "admin" && existingEvent['Produksi Event']) {
+            data['ProduksiEvent'] = existingEvent['Produksi Event'];
+            data['KetProduksi'] = existingEvent['KetProduksi'] || data['KetProduksi'];
+            console.log("Field 'Produksi Event' dikunci. Menggunakan nilai yang sudah ada.");
+          }
+          // Catatan: Field "Jumlah Pengunjung" TIDAK dikunci — semua user boleh mengupdate-nya.
+        }
+        console.log('test');
+        try {
+          Utils.showStatus(Elements.statusMessage, 'Menyimpan data...', 'info');
+          // Kirim sebagai JSON (seperti di versi 3 yang berhasil)
+          const response = await fetch(CONFIG.SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+          });
+          console.log(response);
+          if (!response.ok) throw new Error('Gagal menyimpan data');
+          // Jika event sudah ada, update data yang lama
+          const existingIndex = AppState.allEvents.findIndex(event => 
+            event['Nama Event'] === eventName &&
+            event['Tgl Mulai'] === startDate &&
+            event['Tgl Akhir'] === endDate
+          );
+          if (existingIndex >= 0) {
+            AppState.allEvents[existingIndex] = data;
+          } else {
+            AppState.allEvents.push(data);
+          }
+          Utils.showStatus(Elements.statusMessage, 'Data berhasil disimpan!', 'success');
+          Elements.eventForm.reset();
+          this.resetCalculatedFields();
+          document.getElementById("namaPenginput").value = localStorage.getItem("username");
+        } catch (error) {
+          Utils.showStatus(Elements.statusMessage, `Gagal menyimpan: ${error.message}`, 'error');
+        }
+      },
+      resetCalculatedFields() {
+        ['totalEkonomi', 'kategori', 'kesimpulan', 'saran', 'totalUMKM', 'totalKostum', 'multiplier', 'lamaHari']
+          .forEach(id => document.getElementById(id).value = '');
+      }
+    };
+    const DataManager = {
+      async loadEvents() {
+        try {
+          Utils.showStatus(Elements.eventsStatus, 'Memuat data...', 'info');
+          const authToken = localStorage.getItem("authToken");
+          const response = await fetch(`${CONFIG.SCRIPT_URL}?action=read&token=${encodeURIComponent(authToken)}`);
+          if (!response.ok) throw new Error('Gagal mengambil data');
+          const data = await response.json();
+          AppState.allEvents = Array.isArray(data) ? data : this.extractArrayFromData(data);
+          this.renderEvents();
+          this.updateSummary();
+          ChartManager.renderCharts();
+          Utils.showStatus(Elements.eventsStatus, 'Data berhasil dimuat', 'success');
+        } catch (error) {
+          console.error('Error loading events:', error);
+          Utils.showStatus(Elements.eventsStatus, `Gagal memuat data: ${error.message}`, 'error');
+          if (error.message.includes('Failed to fetch')) {
+            Utils.showStatus(Elements.eventsStatus, 'Menggunakan data demo (tidak ada koneksi internet)', 'info');
+            this.loadDemoData();
+          }
+        }
+      },
+      extractArrayFromData(data) {
+        const possibleArrays = ['records', 'data', 'events', 'values'];
+        for (const key of possibleArrays) {
+          if (data[key] && Array.isArray(data[key])) return data[key];
+        }
+        return [];
+      },
+      loadDemoData() {
+        AppState.allEvents = [
+          {
+            'Nama Event': 'Festival Budaya Lokal',
+            'Jenis Event': 'Lokal',
+            'Tgl Mulai': '2024-01-15',
+            'Tgl Akhir': '2024-01-17',
+            'Lama Hari': 3,
+            'Jumlah Pengunjung': 5000,
+            'Produksi Event': 100000000,
+            'KetProduksi': 'Dana dari APBD',
+            'Total UMKM': 80000000,
+            'KetUMKM': '50 UMKM lokal berpartisipasi',
+            'Parkir': 15000000,
+            'KetParkir': 'Parkir area seluas 2 hektar',
+            'Hotel': 0,
+            'KetHotel': '',
+            'Resto': 0,
+            'KetResto': '',
+            'Lainnya': 25000000,
+            'KetLainlain': 'Souvenir dan cenderamata',
+            'Total Kostum': 30000000,
+            'Total Ekonomi': 250000000,
+            'Kategori': 'Ekonomi Rendah',
+            'Multiplier Effect': '2.5 (Positif)',
+            'Kesimpulan': 'Dampak ekonomi cukup baik',
+            'Saran': 'Pertahankan kualitas dan libatkan lebih banyak UMKM',
+            'NamaPenginput': 'dinas1'
+          },
+          {
+            'Nama Event': 'Festival Musik Nasional',
+            'Jenis Event': 'Nasional',
+            'Tgl Mulai': '2024-02-20',
+            'Tgl Akhir': '2024-02-23',
+            'Lama Hari': 4,
+            'Jumlah Pengunjung': 15000,
+            'Produksi Event': 300000000,
+            'KetProduksi': 'Sponsor dari berbagai perusahaan',
+            'Total UMKM': 200000000,
+            'KetUMKM': '100 UMKM dari berbagai daerah',
+            'Parkir': 50000000,
+            'KetParkir': 'Parkir berlapis dengan sistem digital',
+            'Hotel': 100000000,
+            'KetHotel': 'Hotel di sekitar lokasi penuh',
+            'Resto': 75000000,
+            'KetResto': 'Kuliner lokal sangat diminati',
+            'Lainnya': 25000000,
+            'KetLainlain': 'Merchandise dan sponsor',
+            'Total Kostum': 0,
+            'Total Ekonomi': 750000000,
+            'Kategori': 'Ekonomi Menengah',
+            'Multiplier Effect': '2.5 (Positif)',
+            'Kesimpulan': 'Dampak ekonomi sangat baik',
+            'Saran': 'Event bisa dijadikan agenda rutin berskala besar',
+            'NamaPenginput': 'admin'
+          }
+        ];
+        this.renderEvents();
+        this.updateSummary();
+        ChartManager.renderCharts();
+      },
+      renderEvents(events = AppState.allEvents) {
+        const tbody = Elements.eventsTable.querySelector('tbody');
+        tbody.innerHTML = '';
+        const userRole = localStorage.getItem("userRole");
+        const username = localStorage.getItem("username");
+        let filteredEvents = events;
+        if (userRole === "user") {
+          filteredEvents = events.filter(event => event['Nama Penginput'] === username);
+        }
+        if (filteredEvents.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="17" style="text-align: center;">Tidak ada data</td></tr>';
+          return;
+        }
+        const sortedEvents = this.sortEvents(filteredEvents);
+        sortedEvents.forEach((event, index) => {
+          const tr = document.createElement('tr');
+          let lamaHari = event['Lama Hari'] || '-';
+          if (event['Tgl Mulai'] && event['Tgl Akhir']) {
+            const start = new Date(event['Tgl Mulai']);
+            const end = new Date(event['Tgl Akhir']);
+            lamaHari = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+          }
+          const kategori = Utils.extractFieldValue(event, ['Kategori', 'kategori']) || 
+                          Utils.getEconomicCategory(event['Total Ekonomi']);
+          tr.innerHTML = `
+            <td class="center">${index + 1}</td>
+            <td>${event['Nama Penginput'] || ''}</td>
+            <td>${event['Nama Event'] || '-'}</td>
+            <td class="center">${event['Jenis Event'] || '-'}</td>
+            <td class="center">${Utils.formatDate(event['Tgl Mulai'])}</td>
+            <td class="center">${Utils.formatDate(event['Tgl Akhir'])}</td>
+            <td class="center">${lamaHari}</td>
+            <td class="number">${Utils.formatRupiah(event['Jumlah Pengunjung'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Produksi Event'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Total UMKM (Rp)'] || event['Total UMKM'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Parkir R2 dan R4'] || event['Parkir'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Hotel & Homestay'] || event['Hotel'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Resto & Oleh2'] || event['Resto'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Lain-lain'] || event['Lainnya'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Total Kostum (Rp)'] || event['Total Kostum'])}</td>
+            <td class="currency">Rp ${Utils.formatRupiah(event['Total Ekonomi'])}</td>
+            <td class="center">${kategori}</td>
+            <td class="center">
+              <button class="btn btn-info" onclick="EventDetailModal.show(${AppState.allEvents.indexOf(event)})">Lihat</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      },
+      sortEvents(events) {
+        const sortBy = AppState.currentFilter.sort;
+        switch (sortBy) {
+          case 'Tanggal':
+            return events.sort((a, b) => new Date(b['Tgl Mulai']) - new Date(a['Tgl Mulai']));
+          case 'NamaEvent':
+            return events.sort((a, b) => (a['Nama Event'] || '').localeCompare(b['Nama Event'] || ''));
+          case 'TotalEkonomi':
+            return events.sort((a, b) => (b['Total Ekonomi'] || 0) - (a['Total Ekonomi'] || 0));
+          default:
+            return events;
+        }
+      },
+      updateSummary() {
+        const events = AppState.allEvents;
+        const totalEvents = events.length;
+        const totalEconomy = events.reduce((sum, event) => sum + (event['Total Ekonomi'] || 0), 0);
+        const averageEconomy = totalEvents > 0 ? totalEconomy / totalEvents : 0;
+        let biggestEvent = '-';
+        if (totalEvents > 0) {
+          const biggest = events.reduce((max, event) => 
+            (event['Total Ekonomi'] || 0) > (max['Total Ekonomi'] || 0) ? event : max, events[0]);
+          biggestEvent = biggest['Nama Event'] || 'Tidak diketahui';
+        }
+        document.getElementById('totalEvents').textContent = totalEvents;
+        document.getElementById('totalEconomy').textContent = `Rp ${Utils.formatRupiah(totalEconomy)}`;
+        document.getElementById('averageEconomy').textContent = `Rp ${Utils.formatRupiah(averageEconomy)}`;
+        document.getElementById('biggestEvent').textContent = biggestEvent;
+      }
+    };
+    const ChartManager = {
+      renderCharts() {
+        if (AppState.allEvents.length === 0) return;
+        this.renderEventTypeChart();
+        this.renderEventCategoryChart();
+      },
+      renderEventTypeChart() {
+        const canvas = document.getElementById('eventTypeChart');
+        if (!canvas) return;
+        if (AppState.charts.eventType) {
+          AppState.charts.eventType.destroy();
+        }
+        const typeData = {};
+        AppState.allEvents.forEach(event => {
+          const jenis = event['Jenis Event'] || 'Tidak Diketahui';
+          typeData[jenis] = (typeData[jenis] || 0) + 1;
+        });
+        const ctx = canvas.getContext('2d');
+        AppState.charts.eventType = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: Object.keys(typeData),
+            datasets: [{
+              data: Object.values(typeData),
+              backgroundColor: CONFIG.CHART_COLORS
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { position: 'bottom' }
+            }
+          }
+        });
+      },
+      renderEventCategoryChart() {
+        const canvas = document.getElementById('eventCategoryChart');
+        if (!canvas) return;
+        if (AppState.charts.eventCategory) {
+          AppState.charts.eventCategory.destroy();
+        }
+        const categoryData = {};
+        AppState.allEvents.forEach(event => {
+          let category = Utils.extractFieldValue(event, ['Kategori', 'kategori']) || 
+                        Utils.getEconomicCategory(event['Total Ekonomi']);
+          categoryData[category] = (categoryData[category] || 0) + 1;
+        });
+        const ctx = canvas.getContext('2d');
+        AppState.charts.eventCategory = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(categoryData),
+            datasets: [{
+              data: Object.values(categoryData),
+              backgroundColor: CONFIG.CHART_COLORS
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { position: 'bottom' }
+            }
+          }
+        });
+      }
+    };
+    const FilterManager = {
+      init() {
+        document.getElementById('searchEvent').addEventListener('input', this.applyFilters.bind(this));
+        document.getElementById('filterJenis').addEventListener('change', this.applyFilters.bind(this));
+        document.getElementById('filterKategori').addEventListener('change', this.applyFilters.bind(this));
+        document.getElementById('sortBy').addEventListener('change', this.applyFilters.bind(this));
+        document.getElementById('refreshEvents').addEventListener('click', () => DataManager.loadEvents());
+        Elements.printDetailBtn.addEventListener('click', () => EventDetailModal.print());
+        Elements.printSummaryBtn.addEventListener('click', () => SummaryManager.print());
+        // Tambahkan event listener untuk tombol Rekap
+        document.getElementById('rekapEvents').addEventListener('click', RekapManager.rekapEvent.bind(RekapManager));
+      },
+      applyFilters() {
+        const searchText = document.getElementById('searchEvent').value.toLowerCase();
+        const jenisFilter = document.getElementById('filterJenis').value;
+        const kategoriFilter = document.getElementById('filterKategori').value;
+        const sortBy = document.getElementById('sortBy').value;
+        AppState.currentFilter = { 
+          search: searchText, 
+          jenis: jenisFilter, 
+          kategori: kategoriFilter,
+          sort: sortBy 
+        };
+        const filteredEvents = AppState.allEvents.filter(event => {
+          const matchesSearch = !searchText || 
+            (event['Nama Event'] || '').toLowerCase().includes(searchText);
+          const matchesJenis = !jenisFilter || event['Jenis Event'] === jenisFilter;
+          const eventKategori = Utils.extractFieldValue(event, ['Kategori', 'kategori']) || 
+                               Utils.getEconomicCategory(event['Total Ekonomi']);
+          const matchesKategori = !kategoriFilter || eventKategori === kategoriFilter;
+          return matchesSearch && matchesJenis && matchesKategori;
+        });
+        DataManager.renderEvents(filteredEvents);
+        if (filteredEvents.length !== AppState.allEvents.length) {
+          Utils.showStatus(
+            Elements.eventsStatus, 
+            `Menampilkan ${filteredEvents.length} dari ${AppState.allEvents.length} event`, 
+            'info'
+          );
+        } else {
+          Elements.eventsStatus.style.display = 'none';
+        }
+      }
+    };
+    const PrintManager = {
+      printEvents() {
+        const tableClone = Elements.eventsTable.cloneNode(true);
+        const actionCells = tableClone.querySelectorAll('td:last-child');
+        actionCells.forEach(cell => cell.remove());
+        const actionHeader = tableClone.querySelector('th:last-child');
+        if (actionHeader) actionHeader.remove();
+        const printContainer = document.createElement('div');
+        printContainer.className = 'print-container';
+        const title = document.createElement('h2');
+        title.textContent = 'Laporan Data Event Festival';
+        title.style.textAlign = 'center';
+        title.style.marginBottom = '20px';
+        const date = document.createElement('p');
+        date.textContent = 'Dicetak pada: ' + new Date().toLocaleDateString('id-ID');
+        date.style.textAlign = 'center';
+        date.style.marginBottom = '20px';
+        const filterInfo = document.createElement('p');
+        const filters = [];
+        if (AppState.currentFilter.search) {
+          filters.push(`Pencarian: "${AppState.currentFilter.search}"`);
+        }
+        if (AppState.currentFilter.jenis) {
+          filters.push(`Jenis: ${AppState.currentFilter.jenis}`);
+        }
+        if (AppState.currentFilter.kategori) {
+          filters.push(`Kategori: ${AppState.currentFilter.kategori}`);
+        }
+        if (filters.length > 0) {
+          filterInfo.textContent = 'Filter: ' + filters.join(', ');
+          filterInfo.style.textAlign = 'center';
+          filterInfo.style.marginBottom = '20px';
+          filterInfo.style.fontStyle = 'italic';
+        }
+        printContainer.appendChild(title);
+        printContainer.appendChild(date);
+        if (filters.length > 0) printContainer.appendChild(filterInfo);
+        printContainer.appendChild(tableClone);
+        document.body.appendChild(printContainer);
+        window.print();
+        document.body.removeChild(printContainer);
+      }
+    };
+    const SummaryManager = {
+      print() {
+        const printContainer = document.createElement('div');
+        printContainer.className = 'print-container';
+        const events = AppState.allEvents;
+        const totalEvents = events.length;
+        const totalEconomy = events.reduce((sum, event) => sum + (event['Total Ekonomi'] || 0), 0);
+        const averageEconomy = totalEvents > 0 ? totalEconomy / totalEvents : 0;
+        let biggestEvent = '-';
+        let biggestEconomy = 0;
+        if (totalEvents > 0) {
+          const biggest = events.reduce((max, event) => 
+            (event['Total Ekonomi'] || 0) > (max['Total Ekonomi'] || 0) ? event : max, events[0]);
+          biggestEvent = biggest['Nama Event'] || 'Tidak diketahui';
+          biggestEconomy = biggest['Total Ekonomi'] || 0;
+        }
+        const typeData = {};
+        const categoryData = {};
+        events.forEach(event => {
+          const jenis = event['Jenis Event'] || 'Tidak Diketahui';
+          typeData[jenis] = (typeData[jenis] || 0) + 1;
+          let category = Utils.extractFieldValue(event, ['Kategori', 'kategori']) || 
+                        Utils.getEconomicCategory(event['Total Ekonomi']);
+          categoryData[category] = (categoryData[category] || 0) + 1;
+        });
+        printContainer.innerHTML = `
+          <h1 style="text-align: center; color: #28a745; margin-bottom: 10px;">Laporan Ringkasan Event Festival</h1>
+          <p style="text-align: center; margin-bottom: 30px;">Dicetak pada: ${new Date().toLocaleDateString('id-ID')}</p>
+          <h2 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 15px 0;">Ringkasan Statistik</h2>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+            <tr><td style="padding:10px; border:1px solid #dee2e6; font-weight:bold; width:30%;">Total Event</td><td style="padding:10px; border:1px solid #dee2e6; text-align:center;">${totalEvents}</td></tr>
+            <tr><td style="padding:10px; border:1px solid #dee2e6; font-weight:bold;">Total Nilai Ekonomi</td><td style="padding:10px; border:1px solid #dee2e6; text-align:center;">Rp ${Utils.formatRupiah(totalEconomy)}</td></tr>
+            <tr><td style="padding:10px; border:1px solid #dee2e6; font-weight:bold;">Rata-rata per Event</td><td style="padding:10px; border:1px solid #dee2e6; text-align:center;">Rp ${Utils.formatRupiah(averageEconomy)}</td></tr>
+            <tr><td style="padding:10px; border:1px solid #dee2e6; font-weight:bold;">Event dengan Ekonomi Terbesar</td><td style="padding:10px; border:1px solid #dee2e6; text-align:center;">${biggestEvent} (Rp ${Utils.formatRupiah(biggestEconomy)})</td></tr>
+          </table>
+          <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; justify-content: center;">
+            <div style="flex: 1; min-width: 400px; text-align: center;">
+              <h3 style="color: #495057; margin-bottom: 15px;">Distribusi Jenis Event</h3>
+              <canvas id="printEventTypeChart" width="400" height="300" class="print-chart"></canvas>
+            </div>
+            <div style="flex: 1; min-width: 400px; text-align: center;">
+              <h3 style="color: #495057; margin-bottom: 15px;">Distribusi Kategori Event</h3>
+              <canvas id="printEventCategoryChart" width="400" height="300" class="print-chart"></canvas>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(printContainer);
+        const typeCtx = document.getElementById('printEventTypeChart').getContext('2d');
+        new Chart(typeCtx, {
+          type: 'pie',
+          data: {
+            labels: Object.keys(typeData),
+            datasets: [{
+              data: Object.values(typeData),
+              backgroundColor: CONFIG.CHART_COLORS
+            }]
+          },
+          options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom' }
+            }
+          }
+        });
+        const categoryCtx = document.getElementById('printEventCategoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(categoryData),
+            datasets: [{
+              data: Object.values(categoryData),
+              backgroundColor: CONFIG.CHART_COLORS
+            }]
+          },
+          options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom' }
+            }
+          }
+        });
+        setTimeout(() => {
+          window.print();
+          document.body.removeChild(printContainer);
+        }, 800);
+      }
+    };
+    const NavigationManager = {
+      init() {
+        Elements.navTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-target');
+            Elements.navTabs.forEach(t => t.classList.remove('active'));
+            Elements.contentSections.forEach(s => s.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(target).classList.add('active');
+            if (target === 'eventsSection' || target === 'summarySection') {
+              if (AppState.allEvents.length === 0) {
+                DataManager.loadEvents();
+              } else if (target === 'summarySection') {
+                setTimeout(() => ChartManager.renderCharts(), 100);
+              }
+            }
+          });
+        });
+      }
+    };
+    const EventDetailModal = {
+      show(index) {
+        const event = AppState.allEvents[index];
+        if (!event) return;
+        AppState.currentEventDetail = event;
+        const content = document.getElementById('eventDetailContent');
+        let lamaHari = event['Lama Hari'] || '-';
+        if (event['Tgl Mulai'] && event['Tgl Akhir']) {
+          const start = new Date(event['Tgl Mulai']);
+          const end = new Date(event['Tgl Akhir']);
+          lamaHari = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+        const kategori = Utils.extractFieldValue(event, ['Kategori', 'kategori']) || 
+                        Utils.getEconomicCategory(event['Total Ekonomi']);
+        content.innerHTML = `
+          <h3 style="text-align: center; color: #28a745; margin-bottom: 20px;">${event['Nama Event'] || 'N/A'}</h3>
+          <h4 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Informasi Umum</h4>
+          <div class="detail-item">
+            <span class="detail-label">Jenis Event:</span>
+            <span class="detail-value">${event['Jenis Event'] || 'N/A'}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Tanggal Mulai:</span>
+            <span class="detail-value">${Utils.formatDate(event['Tgl Mulai'])}</span>
+          </div>
+          <div class="detail-item">	
+            <span class="detail-label">Tanggal Akhir:</span>
+            <span class="detail-value">${Utils.formatDate(event['Tgl Akhir'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Lama Hari:</span>
+            <span class="detail-value">${lamaHari} hari</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Jumlah Pengunjung:</span>
+            <span class="detail-value">${Utils.formatRupiah(event['Jumlah Pengunjung'])} orang</span>
+          </div>
+          <h4 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Rincian Ekonomi</h4>
+          <div class="detail-item">
+            <span class="detail-label">Produksi Event:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(event['Produksi Event'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Keterangan Produksi:</span>
+            <span class="detail-value">${event['Ket Produksi'] || ''}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total UMKM:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(event['Total UMKM'] || event['Total UMKM (Rp)'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Keterangan UMKM:</span>
+            <span class="detail-value">${event['Ket UMKM'] || ''}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Parkir:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(event['Parkir'] || event['Parkir R2 dan R4'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Keterangan Parkir:</span>
+            <span class="detail-value">${event['Ket Parkir'] || ''}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Hotel & Homestay:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(event['Hotel'] || event['Hotel & Homestay'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Keterangan Hotel:</span>
+            <span class="detail-value">${event['Ket Hotel & Homestay'] || ''}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Resto & Oleh-oleh:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(event['Resto'] || event['Resto & Oleh2'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Keterangan Resto:</span>
+            <span class="detail-value">${event['Ket Resto & Oleh2'] || ''}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total Kostum:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(event['Total Kostum'] || event['Total Kostum (Rp)'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Lain-lain:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(event['Lainnya'] || event['Lain-lain'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Keterangan Lain-lain:</span>
+            <span class="detail-value">${event['KetLainnya'] || ''}</span>
+          </div>
+          <div class="detail-item" style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+            <span class="detail-label" style="font-size: 16px; color: #28a745;">Total Ekonomi:</span>
+            <span class="detail-value" style="font-size: 18px; font-weight: bold; color: #28a745;">Rp ${Utils.formatRupiah(event['Total Ekonomi'])}</span>
+          </div>
+          <h4 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Analisis</h4>
+          <div class="detail-item">
+            <span class="detail-label">Kategori:</span>
+            <span class="detail-value">${kategori}</span>
+          </div>
+          
+          <!-- Hanya admin yang bisa lihat multiplier, kesimpulan, saran -->
+          ${localStorage.getItem("userRole") === "admin" ? `
+            <div class="detail-item">
+              <span class="detail-label">Multiplier Effect:</span>
+              <span class="detail-value">${event['Multiplier Effect'] || event['Multiplier'] || 'Tidak tersedia'}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Kesimpulan:</span>
+              <span class="detail-value">${event['Kesimpulan'] || 'Tidak tersedia'}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Saran:</span>
+              <span class="detail-value">${event['Saran'] || 'Tidak tersedia'}</span>
+            </div>
+          ` : `
+            <div class="detail-item">
+              <span class="detail-label">Analisis Lanjutan:</span>
+              <span class="detail-value">Hanya admin yang dapat melihat detail analisis.</span>
+            </div>
+          `}
+        `;
+        Elements.modal.style.display = 'block';
+      },
+      hide() {
+        Elements.modal.style.display = 'none';
+      },
+      print() {
+        if (!AppState.currentEventDetail) return;
+        const event = AppState.currentEventDetail;
+        const printContainer = document.createElement('div');
+        printContainer.className = 'print-container';
+        let lamaHari = event['Lama Hari'] || '-';
+        if (event['Tgl Mulai'] && event['Tgl Akhir']) {
+          const start = new Date(event['Tgl Mulai']);
+          const end = new Date(event['Tgl Akhir']);
+          lamaHari = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+        const kategori = Utils.extractFieldValue(event, ['Kategori', 'kategori']) || 
+                        Utils.getEconomicCategory(event['Total Ekonomi']);
+        printContainer.innerHTML = `
+          <h2 style="text-align: center; color: #333; margin-bottom: 20px;">${event['Nama Event'] || 'N/A'}</h2>
+          <p style="text-align: center; margin-bottom: 30px;">Dicetak pada: ${new Date().toLocaleDateString('id-ID')}</p>
+          <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Informasi Umum</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold; width:30%;">Jenis Event</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Jenis Event'] || 'N/A'}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Tanggal Mulai</td><td style="padding:8px; border-bottom:1px solid #eee;">${Utils.formatDate(event['Tgl Mulai'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Tanggal Akhir</td><td style="padding:8px; border-bottom:1px solid #eee;">${Utils.formatDate(event['Tgl Akhir'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Lama Hari</td><td style="padding:8px; border-bottom:1px solid #eee;">${lamaHari} hari</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Jumlah Pengunjung</td><td style="padding:8px; border-bottom:1px solid #eee;">${Utils.formatRupiah(event['Jumlah Pengunjung'])} orang</td></tr>
+          </table>
+          <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Rincian Ekonomi</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Produksi Event</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Produksi Event'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Produksi</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Produksi'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Total UMKM</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Total UMKM'] || event['Total UMKM (Rp)'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan UMKM</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket UMKM'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Parkir</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Parkir'] || event['Parkir R2 dan R4'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Parkir</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Parkir'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Hotel & Homestay</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Hotel'] || event['Hotel & Homestay'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Hotel</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Hotel & Homestay'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Resto & Oleh-oleh</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Resto'] || event['Resto & Oleh2'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Resto</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Resto & Oleh2'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Total Kostum</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Total Kostum'] || event['Total Kostum (Rp)'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Lainnya'] || event['Lain-lain'])}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['KetLainnya'] || ''}</td></tr>
+            <tr style="background: #f8f9fa;"><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold; font-size:16px; color:#28a745;">Total Ekonomi</td><td style="padding:8px; border-bottom:1px solid #eee; font-size:16px; font-weight:bold; color:#28a745;">Rp ${Utils.formatRupiah(event['Total Ekonomi'])}</td></tr>
+          </table>
+          <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Analisis</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Kategori</td><td style="padding:8px; border-bottom:1px solid #eee;">${kategori}</td></tr>
+            
+            <!-- Hanya admin yang bisa lihat multiplier, kesimpulan, saran -->
+            ${localStorage.getItem("userRole") === "admin" ? `
+              <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Multiplier Effect</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Multiplier Effect'] || event['Multiplier'] || 'Tidak tersedia'}</td></tr>
+              <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Kesimpulan</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Kesimpulan'] || 'Tidak tersedia'}</td></tr>
+              <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Saran</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Saran'] || 'Tidak tersedia'}</td></tr>
+            ` : `
+              <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Analisis Lanjutan</td><td style="padding:8px; border-bottom:1px solid #eee;">Hanya admin yang dapat melihat detail analisis.</td></tr>
+            `}
+          </table>
+        `;
+        document.body.appendChild(printContainer);
+        window.print();
+        document.body.removeChild(printContainer);
+      }
+    };
+    // === REKAP MANAGER (DIPERBAIKI SESUAI PERMINTAAN) ===
+    const RekapManager = {
+      rekapEvent() {
+        const events = AppState.allEvents;
+        const rekap = {};
+        // Kelompokkan berdasarkan Nama Event
+        events.forEach(event => {
+          const namaEvent = event['Nama Event'];
+          if (!rekap[namaEvent]) {
+            rekap[namaEvent] = {
+              'Nama Event': namaEvent,
+              'Jumlah Pengunjung': 0,
+              'Produksi Event': 0,
+              'Total UMKM': 0,
+              'Parkir': 0,
+              'Hotel': 0,
+              'Resto': 0,
+              'Lainnya': 0,
+              'Total Kostum': 0,
+              'Tgl Mulai': '',
+              'Tgl Akhir': '',
+              'Penginput': new Set(),
+              'RawEvents': [] // Simpan semua data mentah
+            };
+          }
+          const item = rekap[namaEvent];
+          item.Penginput.add(event['Nama Penginput']);
+          item.RawEvents.push(event);
+          item['Jumlah Pengunjung'] += parseInt(event['Jumlah Pengunjung']) || 0;
+          item['Produksi Event'] += parseInt(event['Produksi Event']) || 0;
+          item['Total UMKM'] += parseInt(event['Total UMKM (Rp)'] || event['Total UMKM']) || 0;
+          item['Parkir'] += parseInt(event['Parkir R2 dan R4'] || event['Parkir']) || 0;
+          item['Hotel'] += parseInt(event['Hotel & Homestay'] || event['Hotel']) || 0;
+          item['Resto'] += parseInt(event['Resto & Oleh2'] || event['Resto']) || 0;
+          item['Lainnya'] += parseInt(event['Lain-lain'] || event['Lainnya']) || 0;
+          item['Total Kostum'] += parseInt(event['Total Kostum (Rp)'] || event['Total Kostum']) || 0;
+          if (event['Tgl Mulai']) {
+            if (!item['Tgl Mulai'] || event['Tgl Mulai'] < item['Tgl Mulai']) {
+              item['Tgl Mulai'] = event['Tgl Mulai'];
+            }
+            if (!item['Tgl Akhir'] || event['Tgl Akhir'] > item['Tgl Akhir']) {
+              item['Tgl Akhir'] = event['Tgl Akhir'];
+            }
+          }
+        });
+        // --- PERBAIKAN 1: Hanya tampilkan event dengan lebih dari 1 penginput ---
+        // Hapus entri yang hanya memiliki satu penginput
+        Object.keys(rekap).forEach(nama => {
+          if (rekap[nama].Penginput.size <= 1) {
+            delete rekap[nama];
+          }
+        });
+        // --- AKHIR PERBAIKAN 1 ---
+        // Hitung ulang Total Ekonomi, Lama Hari, dll untuk setiap entri yang tersisa
+        Object.keys(rekap).forEach(nama => {
+          const item = rekap[nama];
+          item['Total Ekonomi'] = [
+            item['Produksi Event'],
+            item['Total UMKM'],
+            item['Parkir'],
+            item['Hotel'],
+            item['Resto'],
+            item['Lainnya'],
+            item['Total Kostum']
+          ].reduce((a, b) => a + b, 0);
+          if (item['Tgl Mulai'] && item['Tgl Akhir']) {
+            const start = new Date(item['Tgl Mulai']);
+            const end = new Date(item['Tgl Akhir']);
+            item['Lama Hari'] = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+          }
+          item['Kategori'] = Utils.getEconomicCategory(item['Total Ekonomi']);
+          item['Multiplier Effect'] = item['Produksi Event'] > 0 
+            ? `${(item['Total Ekonomi'] / item['Produksi Event']).toFixed(2)} (Positif)` 
+            : 'N/A';
+          item['Kesimpulan'] = item['Kategori'] === 'Ekonomi Minimal' 
+            ? 'Dampak ekonomi masih rendah' 
+            : item['Kategori'] === 'Ekonomi Tinggi'
+            ? 'Dampak ekonomi sangat baik'
+            : 'Dampak ekonomi cukup baik';
+          item['Saran'] = item['Kategori'] === 'Ekonomi Minimal'
+            ? 'Perlu strategi promosi dan peningkatan partisipasi'
+            : item['Kategori'] === 'Ekonomi Tinggi'
+            ? 'Event bisa dijadikan agenda rutin berskala besar'
+            : 'Pertahankan kualitas dan libatkan lebih banyak UMKM';
+        });
+        this.showRekapModal(rekap);
+      },
+      showRekapModal(rekap) {
+        const modal = document.getElementById('rekapModal');
+        const tbody = document.getElementById('rekapTable').getElementsByTagName('tbody')[0] || document.createElement('tbody');
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+          <tr style="background:#28a745; color:white;">
+            <th>No</th>
+            <th>Nama Event</th>
+            <th>Penginput</th>
+            <th>Pengunjung</th>
+            <th>Produksi (Rp)</th>
+            <th>UMKM (Rp)</th>
+            <th>Parkir (Rp)</th>
+            <th>Hotel (Rp)</th>
+            <th>Resto (Rp)</th>
+            <th>Lainnya (Rp)</th>
+            <th>Total Kostum (Rp)</th>
+            <th>Total Ekonomi (Rp)</th>
+            <th>Kategori</th>
+            <th>Aksi</th>
+          </tr>
+        `;
+        tbody.innerHTML = Object.keys(rekap).map((nama, i) => {
+          const ev = rekap[nama];
+          const penginput = Array.from(ev.Penginput).join(', ');
+          return `
+            <tr>
+              <td class="center">${i+1}</td>
+              <td>${ev['Nama Event']}</td>
+              <td>${penginput}</td>
+              <td class="number">${Utils.formatRupiah(ev['Jumlah Pengunjung'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Produksi Event'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Total UMKM'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Parkir'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Hotel'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Resto'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Lainnya'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Total Kostum'])}</td>
+              <td class="currency">Rp ${Utils.formatRupiah(ev['Total Ekonomi'])}</td>
+              <td class="center">${ev['Kategori']}</td>
+              <td class="center">
+                <button class="btn btn-info" onclick="RekapDetailModal.show('${ev['Nama Event']}')">Lihat</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+        const table = document.getElementById('rekapTable');
+        table.innerHTML = '';
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        document.getElementById('rekapDate').textContent = new Date().toLocaleString('id-ID');
+        modal.style.display = 'block';
+        document.getElementById('printRekap').onclick = () => {
+          const printContainer = document.createElement('div');
+          printContainer.className = 'print-container';
+          printContainer.innerHTML = modal.querySelector('.modal-content').innerHTML.replace('Tutup', 'Kembali');
+          document.body.appendChild(printContainer);
+          window.print();
+          document.body.removeChild(printContainer);
+        };
+      }
+    };
+    // === REKAP DETAIL MODAL (DIPERBAIKI SESUAI PERMINTAAN) ===
+    const RekapDetailModal = {
+      show(namaEvent) {
+        const events = AppState.allEvents;
+        const rekap = {};
+        // Re-generate rekap untuk mencari data
+        events.forEach(event => {
+          const nama = event['Nama Event'];
+          if (!rekap[nama]) {
+            rekap[nama] = {
+              'Nama Event': nama,
+              'Jumlah Pengunjung': 0,
+              'Produksi Event': 0,
+              'Total UMKM': 0,
+              'Parkir': 0,
+              'Hotel': 0,
+              'Resto': 0,
+              'Lainnya': 0,
+              'Total Kostum': 0,
+              'Tgl Mulai': '',
+              'Tgl Akhir': '',
+              'Penginput': new Set(),
+              'RawEvents': []
+            };
+          }
+          const item = rekap[nama];
+          item.Penginput.add(event['Nama Penginput']);
+          item.RawEvents.push(event);
+          item['Jumlah Pengunjung'] += parseInt(event['Jumlah Pengunjung']) || 0;
+          item['Produksi Event'] += parseInt(event['Produksi Event']) || 0;
+          item['Total UMKM'] += parseInt(event['Total UMKM (Rp)'] || event['Total UMKM']) || 0;
+          item['Parkir'] += parseInt(event['Parkir R2 dan R4'] || event['Parkir']) || 0;
+          item['Hotel'] += parseInt(event['Hotel & Homestay'] || event['Hotel']) || 0;
+          item['Resto'] += parseInt(event['Resto & Oleh2'] || event['Resto']) || 0;
+          item['Lainnya'] += parseInt(event['Lain-lain'] || event['Lainnya']) || 0;
+          item['Total Kostum'] += parseInt(event['Total Kostum (Rp)'] || event['Total Kostum']) || 0;
+          if (event['Tgl Mulai']) {
+            if (!item['Tgl Mulai'] || event['Tgl Mulai'] < item['Tgl Mulai']) {
+              item['Tgl Mulai'] = event['Tgl Mulai'];
+            }
+            if (!item['Tgl Akhir'] || event['Tgl Akhir'] > item['Tgl Akhir']) {
+              item['Tgl Akhir'] = event['Tgl Akhir'];
+            }
+          }
+        });
+        const data = rekap[namaEvent];
+        if (!data) return;
+        // --- PERBAIKAN 2: Hitung ulang semua nilai analisis sebelum ditampilkan ---
+        // Hitung ulang Total Ekonomi, Lama Hari, Kategori, dll untuk data rekap ini
+        data['Total Ekonomi'] = [
+          data['Produksi Event'],
+          data['Total UMKM'],
+          data['Parkir'],
+          data['Hotel'],
+          data['Resto'],
+          data['Lainnya'],
+          data['Total Kostum']
+        ].reduce((a, b) => a + b, 0);
+        if (data['Tgl Mulai'] && data['Tgl Akhir']) {
+          const start = new Date(data['Tgl Mulai']);
+          const end = new Date(data['Tgl Akhir']);
+          data['Lama Hari'] = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+        data['Kategori'] = Utils.getEconomicCategory(data['Total Ekonomi']);
+        data['Multiplier Effect'] = data['Produksi Event'] > 0 
+          ? `${(data['Total Ekonomi'] / data['Produksi Event']).toFixed(2)} (Positif)` 
+          : 'N/A';
+        data['Kesimpulan'] = data['Kategori'] === 'Ekonomi Minimal' 
+          ? 'Dampak ekonomi masih rendah' 
+          : data['Kategori'] === 'Ekonomi Tinggi'
+          ? 'Dampak ekonomi sangat baik'
+          : 'Dampak ekonomi cukup baik';
+        data['Saran'] = data['Kategori'] === 'Ekonomi Minimal'
+          ? 'Perlu strategi promosi dan peningkatan partisipasi'
+          : data['Kategori'] === 'Ekonomi Tinggi'
+          ? 'Event bisa dijadikan agenda rutin berskala besar'
+          : 'Pertahankan kualitas dan libatkan lebih banyak UMKM';
+        // --- AKHIR PERBAIKAN 2 ---
+        const modal = document.getElementById('rekapDetailModal');
+        document.getElementById('rekapDetailEventName').textContent = namaEvent;
+        const content = document.getElementById('rekapDetailContent');
+        const penginputList = Array.from(data.Penginput).join(', ');
+        content.innerHTML = `
+          <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 15px 0;">Informasi Rekap</h3>
+          <div class="detail-item">
+            <span class="detail-label">Nama Event:</span>
+            <span class="detail-value">${namaEvent}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Penginput:</span>
+            <span class="detail-value">${penginputList}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Lama Hari:</span>
+            <span class="detail-value">${data['Lama Hari']} hari</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Jumlah Pengunjung:</span>
+            <span class="detail-value">${Utils.formatRupiah(data['Jumlah Pengunjung'])} orang</span>
+          </div>
+          <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 15px 0;">Rincian Ekonomi (Total Akumulasi)</h3>
+          <div class="detail-item">
+            <span class="detail-label">Produksi Event:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(data['Produksi Event'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total UMKM:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(data['Total UMKM'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Parkir:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(data['Parkir'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Hotel:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(data['Hotel'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Resto:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(data['Resto'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Lainnya:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(data['Lainnya'])}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total Kostum:</span>
+            <span class="detail-value">Rp ${Utils.formatRupiah(data['Total Kostum'])}</span>
+          </div>
+          <div class="detail-item" style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+            <span class="detail-label" style="font-size: 16px; color: #28a745;">Total Ekonomi:</span>
+            <span class="detail-value" style="font-size: 18px; font-weight: bold; color: #28a745;">Rp ${Utils.formatRupiah(data['Total Ekonomi'])}</span>
+          </div>
+          <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 15px 0;">Analisis</h3>
+          <div class="detail-item">
+            <span class="detail-label">Kategori:</span>
+            <span class="detail-value">${data['Kategori']}</span>
+          </div>
+          
+          <!-- Hanya admin yang bisa lihat multiplier, kesimpulan, saran -->
+          ${localStorage.getItem("userRole") === "admin" ? `
+            <div class="detail-item">
+              <span class="detail-label">Multiplier Effect:</span>
+              <span class="detail-value">${data['Multiplier Effect']}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Kesimpulan:</span>
+              <span class="detail-value">${data['Kesimpulan']}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Saran:</span>
+              <span class="detail-value">${data['Saran']}</span>
+            </div>
+          ` : `
+            <div class="detail-item">
+              <span class="detail-label">Analisis Lanjutan:</span>
+              <span class="detail-value">Hanya admin yang dapat melihat detail analisis.</span>
+            </div>
+          `}
+          <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 15px 0;">Data Inputan Asli</h3>
+          ${data.RawEvents.map((e, i) => `
+            <div class="detail-item" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+              <strong>Input ke-${i+1} oleh: ${e['Nama Penginput']}</strong><br>
+              Pengunjung: ${Utils.formatRupiah(e['Jumlah Pengunjung'])}<br>
+              Produksi: Rp ${Utils.formatRupiah(e['Produksi Event'])}<br>
+              UMKM: Rp ${Utils.formatRupiah(e['Total UMKM'] || e['Total UMKM (Rp)'])}<br>
+              Parkir: Rp ${Utils.formatRupiah(e['Parkir'] || e['Parkir R2 dan R4'])}<br>
+              Hotel: Rp ${Utils.formatRupiah(e['Hotel'] || e['Hotel & Homestay'])}<br>
+              Resto: Rp ${Utils.formatRupiah(e['Resto'] || e['Resto & Oleh2'])}<br>
+              Lainnya: Rp ${Utils.formatRupiah(e['Lainnya'] || e['Lain-lain'])}<br>
+              Total Kostum: Rp ${Utils.formatRupiah(e['Total Kostum'] || e['Total Kostum (Rp)'])}<br>
+              Total Ekonomi: Rp ${Utils.formatRupiah(e['Total Ekonomi'])}
+            </div>
+          `).join('')}
+        `;
+        modal.style.display = 'block';
+        document.getElementById('printRekapDetail').onclick = () => {
+          const printContainer = document.createElement('div');
+          printContainer.className = 'print-container';
+          printContainer.innerHTML = modal.querySelector('.modal-content').innerHTML.replace('Tutup', 'Kembali');
+          document.body.appendChild(printContainer);
+          window.print();
+          document.body.removeChild(printContainer);
+        };
+      }
+    };
+    const App = {
+      init() {
+        console.log('Initializing Festival Economic Data System...');
+        NavigationManager.init();
+        FormHandler.init();
+        FilterManager.init();
+        document.querySelector('.close').addEventListener('click', EventDetailModal.hide);
+        window.addEventListener('click', (e) => {
+          if (e.target === Elements.modal) EventDetailModal.hide();
+        });
+        document.getElementById('printEvents').addEventListener('click', PrintManager.printEvents);
+        DataManager.loadEvents();
+        console.log('App initialized successfully');
+      }
+    };
+    document.addEventListener('DOMContentLoaded', App.init);
+    window.EventDetailModal = EventDetailModal;
+    window.RekapDetailModal = RekapDetailModal;
+  </script>
+</body>
+</html>
