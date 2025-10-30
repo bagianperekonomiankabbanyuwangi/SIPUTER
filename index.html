@@ -1096,7 +1096,7 @@ function setupRoleAccess(userRole) {
     window.addEventListener("DOMContentLoaded", checkAuth);
     // === SISANYA TIDAK BERUBAH ===
     const CONFIG = {
-      SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxK_I7L7UTHtdZX2Ja6MmWUa4RCC_Ju4kxecx-ehidcd6bF5C2XnLpQwCL15NJnUMdJ/exec",
+      SCRIPT_URL: "https://script.google.com/macros/s/AKfycbybyVkMOIxl8CaQ7ZApxwvR7AUeK9f0Snu7MVq3EvrzdWBU_HtINfYH2pnPyri4XgoW/exec",
       CHART_COLORS: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
       ECONOMIC_THRESHOLDS: {
         HIGH: 1000000000,
@@ -1794,7 +1794,7 @@ function setupRoleAccess(userRole) {
           </div>
           <div class="detail-item">
             <span class="detail-label">Keterangan Hotel:</span>
-            <span class="detail-value">${event['Ket Hotel & Homestay'] || ''}</span>
+            <span class="detail-value">${event['Ket Hotel'] || ''}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Resto & Oleh-oleh:</span>
@@ -1802,7 +1802,7 @@ function setupRoleAccess(userRole) {
           </div>
           <div class="detail-item">
             <span class="detail-label">Keterangan Resto:</span>
-            <span class="detail-value">${event['Ket Resto & Oleh2'] || ''}</span>
+            <span class="detail-value">${event['Ket Resto'] || ''}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Total Kostum:</span>
@@ -1885,9 +1885,9 @@ function setupRoleAccess(userRole) {
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Parkir</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Parkir'] || event['Parkir R2 dan R4'])}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Parkir</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Parkir'] || ''}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Hotel & Homestay</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Hotel'] || event['Hotel & Homestay'])}</td></tr>
-            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Hotel</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Hotel & Homestay'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Hotel</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Hotel'] || ''}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Resto & Oleh-oleh</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Resto'] || event['Resto & Oleh2'])}</td></tr>
-            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Resto</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Resto & Oleh2'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Resto</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Resto'] || ''}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Total Kostum</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Total Kostum'] || event['Total Kostum (Rp)'])}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Lainnya'] || event['Lain-lain'])}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['KetLainnya'] || ''}</td></tr>
@@ -2269,3 +2269,4 @@ function setupRoleAccess(userRole) {
 </body>
 
 </html>
+
