@@ -1827,7 +1827,7 @@ function setupRoleAccess(userRole) {
           </div>
           <div class="detail-item">
             <span class="detail-label">Keterangan Lain-lain:</span>
-            <span class="detail-value">${event['KetLainnya'] || ''}</span>
+            <span class="detail-value">${event['KetLainlain'] || ''}</span>
           </div>
           <div class="detail-item" style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
             <span class="detail-label" style="font-size: 16px; color: #28a745;">Total Ekonomi:</span>
@@ -1903,7 +1903,7 @@ function setupRoleAccess(userRole) {
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Resto</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Resto'] || ''}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Total Kostum</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Total Kostum'] || event['Total Kostum (Rp)'])}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Lainnya'] || event['Lain-lain'])}</td></tr>
-            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['KetLainnya'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['KetLainlain'] || ''}</td></tr>
             <tr style="background: #f8f9fa;"><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold; font-size:16px; color:#28a745;">Total Ekonomi</td><td style="padding:8px; border-bottom:1px solid #eee; font-size:16px; font-weight:bold; color:#28a745;">Rp ${Utils.formatRupiah(event['Total Ekonomi'])}</td></tr>
           </table>
           <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Analisis</h3>
@@ -2282,6 +2282,7 @@ function setupRoleAccess(userRole) {
 </body>
 
 </html>
+
 
 
 
