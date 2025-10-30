@@ -1237,59 +1237,70 @@ function setupRoleAccess(userRole) {
       },
       // === Modifikasi Fungsi Submit ===
       async handleFormSubmit(e) {
-        e.preventDefault();
-        const formData = new FormData(Elements.eventForm);
-        const data = Object.fromEntries(formData.entries());
-        // Ambil token dari localStorage
-        const authToken = localStorage.getItem("authToken");
-        console.log(data);
-        console.log(authToken);
-        data.token = authToken; // Tambahkan token ke payload
-        // Ambil data inti untuk cek duplikasi
-        const eventName = data['NamaEvent'];
-        const startDate = data['TglMulai'];
-        const endDate = data['TglAkhir'];
-        // Cek apakah event sudah ada
-        if (EventValidator.isEventDuplicate(eventName, startDate, endDate)) {
-          const existingEvent = EventValidator.getExistingEvent(eventName, startDate, endDate);
-          const userRole = localStorage.getItem("userRole");
-          // Jika user BIASA dan Produksi Event sudah diisi, SIMPAN nilai yang sudah ada
-          if (userRole !== "admin" && existingEvent['Produksi Event']) {
-            data['ProduksiEvent'] = existingEvent['Produksi Event'];
-            data['KetProduksi'] = existingEvent['KetProduksi'] || data['KetProduksi'];
-            console.log("Field 'Produksi Event' dikunci. Menggunakan nilai yang sudah ada.");
-          }
-          // Catatan: Field "Jumlah Pengunjung" TIDAK dikunci — semua user boleh mengupdate-nya.
-        }
-        console.log('test');
-        try {
-          Utils.showStatus(Elements.statusMessage, 'Menyimpan data...', 'info');
-          // Kirim sebagai JSON (seperti di versi 3 yang berhasil)
-          const response = await fetch(CONFIG.SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(data)
-          });
-          console.log(response);
-          if (!response.ok) throw new Error('Gagal menyimpan data');
-          // Jika event sudah ada, update data yang lama
-          const existingIndex = AppState.allEvents.findIndex(event => 
-            event['Nama Event'] === eventName &&
-            event['Tgl Mulai'] === startDate &&
-            event['Tgl Akhir'] === endDate
-          );
-          if (existingIndex >= 0) {
-            AppState.allEvents[existingIndex] = data;
-          } else {
-            AppState.allEvents.push(data);
-          }
-          Utils.showStatus(Elements.statusMessage, 'Data berhasil disimpan!', 'success');
-          Elements.eventForm.reset();
-          this.resetCalculatedFields();
-          document.getElementById("namaPenginput").value = localStorage.getItem("username");
-        } catch (error) {
-          Utils.showStatus(Elements.statusMessage, `Gagal menyimpan: ${error.message}`, 'error');
-        }
-      },
+		  e.preventDefault();
+		  const formData = new FormData(Elements.eventForm);
+		  const data = Object.fromEntries(formData.entries());
+		  const authToken = localStorage.getItem("authToken");
+		  data.token = authToken;
+		
+		  const eventName = data['NamaEvent'];
+		  const startDate = data['TglMulai'];
+		  const endDate = data['TglAkhir'];
+		
+		  // Cek duplikat
+		  if (EventValidator.isEventDuplicate(eventName, startDate, endDate)) {
+		    const existingEvent = EventValidator.getExistingEvent(eventName, startDate, endDate);
+		    const userRole = localStorage.getItem("userRole");
+		    // Jika user BUKAN admin dan ProduksiEvent sudah ada, gunakan nilai lama
+		    if (userRole !== "admin" && existingEvent['Produksi Event']) {
+		      data['ProduksiEvent'] = existingEvent['Produksi Event'];
+		      data['KetProduksi'] = existingEvent['KetProduksi'] || data['KetProduksi'];
+		      console.log("Field 'Produksi Event' dikunci. Menggunakan nilai yang sudah ada.");
+		    }
+		  }
+		
+		  // === HITUNG ULANG TOTAL EKONOMI BERDASARKAN NILAI AKHIR ===
+		  const days = parseInt(data['LamaHari']) || 1;
+		  const umkmTotal = (parseInt(data['JumlahUMKM']) || 0) * (parseInt(data['PendapatanUMKM']) || 0) * days;
+		  const kostumTotal = (parseInt(data['JumlahTalent']) || 0) * (parseInt(data['EstimasiKostum']) || 0) * days;
+		
+		  const produksiFinal = parseInt(data['ProduksiEvent']) || 0;
+		  const parkirFinal = parseInt(data['Parkir']) || 0;
+		  const hotelFinal = parseInt(data['Hotel']) || 0;
+		  const restoFinal = parseInt(data['Resto']) || 0;
+		  const lainnyaFinal = parseInt(data['Lainnya']) || 0;
+		
+		  data['TotalEkonomi'] = produksiFinal + parkirFinal + hotelFinal + restoFinal + lainnyaFinal + umkmTotal + kostumTotal;
+		  // === AKHIR PERHITUNGAN ULANG ===
+		
+		  try {
+		    Utils.showStatus(Elements.statusMessage, 'Menyimpan data...', 'info');
+		    const response = await fetch(CONFIG.SCRIPT_URL, {
+		      method: 'POST',
+		      body: JSON.stringify(data)
+		    });
+		    if (!response.ok) throw new Error('Gagal menyimpan data');
+		
+		    const existingIndex = AppState.allEvents.findIndex(event => 
+		      event['Nama Event'] === eventName &&
+		      event['Tgl Mulai'] === startDate &&
+		      event['Tgl Akhir'] === endDate
+		    );
+		
+		    if (existingIndex >= 0) {
+		      AppState.allEvents[existingIndex] = data;
+		    } else {
+		      AppState.allEvents.push(data);
+		    }
+		
+		    Utils.showStatus(Elements.statusMessage, 'Data berhasil disimpan!', 'success');
+		    Elements.eventForm.reset();
+		    this.resetCalculatedFields();
+		    document.getElementById("namaPenginput").value = localStorage.getItem("username");
+		  } catch (error) {
+		    Utils.showStatus(Elements.statusMessage, `Gagal menyimpan: ${error.message}`, 'error');
+		  }
+		},
       resetCalculatedFields() {
         ['totalEkonomi', 'kategori', 'kesimpulan', 'saran', 'totalUMKM', 'totalKostum', 'multiplier', 'lamaHari']
           .forEach(id => document.getElementById(id).value = '');
@@ -2271,5 +2282,6 @@ function setupRoleAccess(userRole) {
 </body>
 
 </html>
+
 
 
