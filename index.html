@@ -1209,10 +1209,12 @@ function setupRoleAccess(userRole) {
         const kostumTotal = (parseInt(formData.get('JumlahTalent')) || 0) * 
                            (parseInt(formData.get('EstimasiKostum')) || 0) * days;
         document.getElementById('totalKostum').value = kostumTotal;
-        const ekonomiTotal = [
-          'ProduksiEvent', 'Parkir', 'Hotel', 'Resto', 'Lainnya'
-        ].reduce((sum, field) => sum + (parseInt(formData.get(field)) || 0), 0) + 
-        umkmTotal + kostumTotal;
+        const produksi = parseInt(formData.get('ProduksiEvent')) || 0;
+		const parkir = parseInt(formData.get('Parkir')) || 0;
+		const hotel = parseInt(formData.get('Hotel')) || 0;
+		const resto = parseInt(formData.get('Resto')) || 0;
+		const lainnya = parseInt(formData.get('Lainnya')) || 0;
+		const ekonomiTotal = produksi + parkir + hotel + resto + lainnya + umkmTotal + kostumTotal;
         document.getElementById('totalEkonomi').value = ekonomiTotal;
         const userRole = localStorage.getItem("userRole");
         if (userRole === "admin") {
@@ -2269,4 +2271,5 @@ function setupRoleAccess(userRole) {
 </body>
 
 </html>
+
 
