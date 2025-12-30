@@ -1096,7 +1096,7 @@ function setupRoleAccess(userRole) {
     window.addEventListener("DOMContentLoaded", checkAuth);
     // === SISANYA TIDAK BERUBAH ===
     const CONFIG = {
-      SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwJY8JQh6JbO5fyhaPn_4vWnERlj13ufXn2eWV3HHrKqq-mtMjMasLMsvHp0zPOeFbX/exec",
+      SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxK_I7L7UTHtdZX2Ja6MmWUa4RCC_Ju4kxecx-ehidcd6bF5C2XnLpQwCL15NJnUMdJ/exec",
       CHART_COLORS: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
       ECONOMIC_THRESHOLDS: {
         HIGH: 1000000000,
@@ -1209,12 +1209,10 @@ function setupRoleAccess(userRole) {
         const kostumTotal = (parseInt(formData.get('JumlahTalent')) || 0) * 
                            (parseInt(formData.get('EstimasiKostum')) || 0) * days;
         document.getElementById('totalKostum').value = kostumTotal;
-        const produksi = parseInt(formData.get('ProduksiEvent')) || 0;
-		const parkir = parseInt(formData.get('Parkir')) || 0;
-		const hotel = parseInt(formData.get('Hotel')) || 0;
-		const resto = parseInt(formData.get('Resto')) || 0;
-		const lainnya = parseInt(formData.get('Lainnya')) || 0;
-		const ekonomiTotal = produksi + parkir + hotel + resto + lainnya + umkmTotal + kostumTotal;
+        const ekonomiTotal = [
+          'ProduksiEvent', 'Parkir', 'Hotel', 'Resto', 'Lainnya'
+        ].reduce((sum, field) => sum + (parseInt(formData.get(field)) || 0), 0) + 
+        umkmTotal + kostumTotal;
         document.getElementById('totalEkonomi').value = ekonomiTotal;
         const userRole = localStorage.getItem("userRole");
         if (userRole === "admin") {
@@ -1237,70 +1235,59 @@ function setupRoleAccess(userRole) {
       },
       // === Modifikasi Fungsi Submit ===
       async handleFormSubmit(e) {
-		  e.preventDefault();
-		  const formData = new FormData(Elements.eventForm);
-		  const data = Object.fromEntries(formData.entries());
-		  const authToken = localStorage.getItem("authToken");
-		  data.token = authToken;
-		
-		  const eventName = data['NamaEvent'];
-		  const startDate = data['TglMulai'];
-		  const endDate = data['TglAkhir'];
-		
-		  // Cek duplikat
-		  if (EventValidator.isEventDuplicate(eventName, startDate, endDate)) {
-		    const existingEvent = EventValidator.getExistingEvent(eventName, startDate, endDate);
-		    const userRole = localStorage.getItem("userRole");
-		    // Jika user BUKAN admin dan ProduksiEvent sudah ada, gunakan nilai lama
-		    if (userRole !== "admin" && existingEvent['Produksi Event']) {
-		      data['ProduksiEvent'] = existingEvent['Produksi Event'];
-		      data['KetProduksi'] = existingEvent['KetProduksi'] || data['KetProduksi'];
-		      console.log("Field 'Produksi Event' dikunci. Menggunakan nilai yang sudah ada.");
-		    }
-		  }
-		
-		  // === HITUNG ULANG TOTAL EKONOMI BERDASARKAN NILAI AKHIR ===
-		  const days = parseInt(data['LamaHari']) || 1;
-		  const umkmTotal = (parseInt(data['JumlahUMKM']) || 0) * (parseInt(data['PendapatanUMKM']) || 0) * days;
-		  const kostumTotal = (parseInt(data['JumlahTalent']) || 0) * (parseInt(data['EstimasiKostum']) || 0) * days;
-		
-		  const produksiFinal = parseInt(data['ProduksiEvent']) || 0;
-		  const parkirFinal = parseInt(data['Parkir']) || 0;
-		  const hotelFinal = parseInt(data['Hotel']) || 0;
-		  const restoFinal = parseInt(data['Resto']) || 0;
-		  const lainnyaFinal = parseInt(data['Lainnya']) || 0;
-		
-		  data['TotalEkonomi'] = produksiFinal + parkirFinal + hotelFinal + restoFinal + lainnyaFinal + umkmTotal + kostumTotal;
-		  // === AKHIR PERHITUNGAN ULANG ===
-		
-		  try {
-		    Utils.showStatus(Elements.statusMessage, 'Menyimpan data...', 'info');
-		    const response = await fetch(CONFIG.SCRIPT_URL, {
-		      method: 'POST',
-		      body: JSON.stringify(data)
-		    });
-		    if (!response.ok) throw new Error('Gagal menyimpan data');
-		
-		    const existingIndex = AppState.allEvents.findIndex(event => 
-		      event['Nama Event'] === eventName &&
-		      event['Tgl Mulai'] === startDate &&
-		      event['Tgl Akhir'] === endDate
-		    );
-		
-		    if (existingIndex >= 0) {
-		      AppState.allEvents[existingIndex] = data;
-		    } else {
-		      AppState.allEvents.push(data);
-		    }
-		
-		    Utils.showStatus(Elements.statusMessage, 'Data berhasil disimpan!', 'success');
-		    Elements.eventForm.reset();
-		    this.resetCalculatedFields();
-		    document.getElementById("namaPenginput").value = localStorage.getItem("username");
-		  } catch (error) {
-		    Utils.showStatus(Elements.statusMessage, `Gagal menyimpan: ${error.message}`, 'error');
-		  }
-		},
+        e.preventDefault();
+        const formData = new FormData(Elements.eventForm);
+        const data = Object.fromEntries(formData.entries());
+        // Ambil token dari localStorage
+        const authToken = localStorage.getItem("authToken");
+        console.log(data);
+        console.log(authToken);
+        data.token = authToken; // Tambahkan token ke payload
+        // Ambil data inti untuk cek duplikasi
+        const eventName = data['NamaEvent'];
+        const startDate = data['TglMulai'];
+        const endDate = data['TglAkhir'];
+        // Cek apakah event sudah ada
+        if (EventValidator.isEventDuplicate(eventName, startDate, endDate)) {
+          const existingEvent = EventValidator.getExistingEvent(eventName, startDate, endDate);
+          const userRole = localStorage.getItem("userRole");
+          // Jika user BIASA dan Produksi Event sudah diisi, SIMPAN nilai yang sudah ada
+          if (userRole !== "admin" && existingEvent['Produksi Event']) {
+            data['ProduksiEvent'] = existingEvent['Produksi Event'];
+            data['KetProduksi'] = existingEvent['KetProduksi'] || data['KetProduksi'];
+            console.log("Field 'Produksi Event' dikunci. Menggunakan nilai yang sudah ada.");
+          }
+          // Catatan: Field "Jumlah Pengunjung" TIDAK dikunci — semua user boleh mengupdate-nya.
+        }
+        console.log('test');
+        try {
+          Utils.showStatus(Elements.statusMessage, 'Menyimpan data...', 'info');
+          // Kirim sebagai JSON (seperti di versi 3 yang berhasil)
+          const response = await fetch(CONFIG.SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+          });
+          console.log(response);
+          if (!response.ok) throw new Error('Gagal menyimpan data');
+          // Jika event sudah ada, update data yang lama
+          const existingIndex = AppState.allEvents.findIndex(event => 
+            event['Nama Event'] === eventName &&
+            event['Tgl Mulai'] === startDate &&
+            event['Tgl Akhir'] === endDate
+          );
+          if (existingIndex >= 0) {
+            AppState.allEvents[existingIndex] = data;
+          } else {
+            AppState.allEvents.push(data);
+          }
+          Utils.showStatus(Elements.statusMessage, 'Data berhasil disimpan!', 'success');
+          Elements.eventForm.reset();
+          this.resetCalculatedFields();
+          document.getElementById("namaPenginput").value = localStorage.getItem("username");
+        } catch (error) {
+          Utils.showStatus(Elements.statusMessage, `Gagal menyimpan: ${error.message}`, 'error');
+        }
+      },
       resetCalculatedFields() {
         ['totalEkonomi', 'kategori', 'kesimpulan', 'saran', 'totalUMKM', 'totalKostum', 'multiplier', 'lamaHari']
           .forEach(id => document.getElementById(id).value = '');
@@ -1807,7 +1794,7 @@ function setupRoleAccess(userRole) {
           </div>
           <div class="detail-item">
             <span class="detail-label">Keterangan Hotel:</span>
-            <span class="detail-value">${event['Ket Hotel'] || ''}</span>
+            <span class="detail-value">${event['Ket Hotel & Homestay'] || ''}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Resto & Oleh-oleh:</span>
@@ -1815,7 +1802,7 @@ function setupRoleAccess(userRole) {
           </div>
           <div class="detail-item">
             <span class="detail-label">Keterangan Resto:</span>
-            <span class="detail-value">${event['Ket Resto'] || ''}</span>
+            <span class="detail-value">${event['Ket Resto & Oleh2'] || ''}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Total Kostum:</span>
@@ -1827,7 +1814,7 @@ function setupRoleAccess(userRole) {
           </div>
           <div class="detail-item">
             <span class="detail-label">Keterangan Lain-lain:</span>
-            <span class="detail-value">${event['KetLainlain'] || ''}</span>
+            <span class="detail-value">${event['KetLainnya'] || ''}</span>
           </div>
           <div class="detail-item" style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
             <span class="detail-label" style="font-size: 16px; color: #28a745;">Total Ekonomi:</span>
@@ -1898,12 +1885,12 @@ function setupRoleAccess(userRole) {
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Parkir</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Parkir'] || event['Parkir R2 dan R4'])}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Parkir</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Parkir'] || ''}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Hotel & Homestay</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Hotel'] || event['Hotel & Homestay'])}</td></tr>
-            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Hotel</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Hotel'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Hotel</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Hotel & Homestay'] || ''}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Resto & Oleh-oleh</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Resto'] || event['Resto & Oleh2'])}</td></tr>
-            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Resto</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Resto'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Resto</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['Ket Resto & Oleh2'] || ''}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Total Kostum</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Total Kostum'] || event['Total Kostum (Rp)'])}</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">Rp ${Utils.formatRupiah(event['Lainnya'] || event['Lain-lain'])}</td></tr>
-            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['KetLainlain'] || ''}</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold;">Keterangan Lain-lain</td><td style="padding:8px; border-bottom:1px solid #eee;">${event['KetLainnya'] || ''}</td></tr>
             <tr style="background: #f8f9fa;"><td style="padding:8px; border-bottom:1px solid #eee; font-weight:bold; font-size:16px; color:#28a745;">Total Ekonomi</td><td style="padding:8px; border-bottom:1px solid #eee; font-size:16px; font-weight:bold; color:#28a745;">Rp ${Utils.formatRupiah(event['Total Ekonomi'])}</td></tr>
           </table>
           <h3 style="color: #495057; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0;">Analisis</h3>
@@ -2282,8 +2269,3 @@ function setupRoleAccess(userRole) {
 </body>
 
 </html>
-
-
-
-
-
